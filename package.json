@@ -15,6 +15,9 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/jehy/quest#readme",
   "dependencies": {
+    "bluebird": "^3.4.7",
+    "knex": "^0.12.6",
+    "mysql2": "^1.1.2",
     "node-telegram-bot-api": "^0.26.0"
   }
 }

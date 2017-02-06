@@ -1,0 +1,19 @@
+{
+  "name": "quest",
+  "version": "1.0.0",
+  "description": "Telegram quest app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/jehy/quest.git"
+  },
+  "author": "Jehy <npm@jehy.ru>",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/jehy/quest#readme",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.26.0"
+  }
+}

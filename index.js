@@ -86,7 +86,7 @@ var showStage = function (stageData, msg) {
   var description = knex('stages').where({
     quest_id: stageData.quest_id,
     id: stageData.stage_id
-  }).select('description');
+  }).select('description').first();
   var actions = knex('stage_actions').where({
     quest_id: stageData.quest_id,
     stage_id: stageData.stage_id
@@ -94,7 +94,7 @@ var showStage = function (stageData, msg) {
   var images = knex('stage_image').where({
     quest_id: stageData.quest_id,
     stage_id: stageData.stage_id
-  }).select('placement', 'image');
+  }).select('placement', 'image','caption');
   images.then(function (imagesData) {
     if (imagesData.length === 0) {
       return;
@@ -113,7 +113,7 @@ var showStage = function (stageData, msg) {
         keyboard: [data[0]]
       })
     };
-    bot.sendMessage(chatId, data[1][0].description, opts);
+    bot.sendMessage(chatId, data[1].description, opts);
   })
 };
 

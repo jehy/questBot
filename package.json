@@ -4,6 +4,8 @@
   "description": "Telegram quest app",
   "main": "index.js",
   "scripts": {
+    "migrate-up": "./node_modules/.bin/knex migrate:latest",
+    "migrate-down": "./node_modules/.bin/knex migrate:rollback",
     "test": "./node_modules/mocha/bin/mocha",
     "start": "node --use_strict index.js"
   },

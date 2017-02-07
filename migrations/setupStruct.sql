@@ -18,7 +18,7 @@ CREATE TABLE `stages` (
   `quest_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `stages_quest_id` (`quest_id`),
-  CONSTRAINT `stages_quest_id` FOREIGN KEY (`quest_id`) REFERENCES `stages` (`id`)
+  CONSTRAINT `stages_quest_id` FOREIGN KEY (`quest_id`) REFERENCES `quests` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 

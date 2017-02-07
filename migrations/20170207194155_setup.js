@@ -1,31 +1,23 @@
-var fsp = require('fs-promise');
+"use strict";
+const runFile = require('../modules/runSQLFileSync');
+
 exports.up = function (knex, Promise) {
-  return fsp.readFile('migrations/setupStruct.sql', {encoding: 'utf8'}).then(function (sqlData) {
-    sqlData = (sqlData.trim());
-    var arr = sqlData.split(";\r\n");
-    var creates = [];
-    for (var i = 0; i < arr.length; i++) {
-      creates.push(knex.schema.raw(arr[i]));
-    }
-    return Promise.all(creates);
-  })
+  return runFile(knex, 'migrations/setupStruct.sql');
 };
 
 exports.down = function (knex, Promise) {
-  return knex.schema.dropTable('stage_actions').then(function () {
-    return knex.schema.dropTable('stage_image');
-  }).then(function () {
-    return knex.schema.dropTable('stage2stage');
-  }).then(function () {
-    return knex.schema.dropTable('user_item');
-  }).then(function () {
-    return knex.schema.dropTable('user_quest');
-  }).then(function () {
-    return knex.schema.dropTable('stages');
-  }).then(function () {
-    return knex.schema.dropTable('users');
-  }).then(function () {
-    return knex.schema.dropTable('items');
+  let secondary = [];
+  secondary.push(knex.schema.dropTable('stage_actions'));
+  secondary.push(knex.schema.dropTable('stage_image'));
+  secondary.push(knex.schema.dropTable('stage2stage'));
+  secondary.push(knex.schema.dropTable('user_item'));
+  secondary.push(knex.schema.dropTable('user_quest'));
+  return Promise.all(secondary).then(function () {
+    let primary = [];
+    primary.push(knex.schema.dropTable('stages'));
+    primary.push(knex.schema.dropTable('users'));
+    primary.push(knex.schema.dropTable('items'));
+    return Promise.all(primary);
   }).then(function () {
     return knex.schema.dropTable('quests');
   });

@@ -1,40 +1,29 @@
-var fsp = require('fs-promise');
+"use strict";
+const
+  runFile=require('../modules/runSQLFileSync');
 
 
 exports.up = function (knex, Promise) {
-  return fsp.readFile('migrations/setupData.sql', {encoding: 'utf8'})
-    .then(function (sqlData) {
-      sqlData = (sqlData.trim());
-      var arr = sqlData.split(";\r\n");
-      var inserts = [];
-      for (var i = 0; i < arr.length; i++) {
-        inserts.push(knex.schema.raw(arr[i]));
-      }
-      return Promise.all(inserts);
-    })
+  return runFile(knex,'migrations/setupData.sql');
 };
 
-exports.down = function (knex) {
-  return knex.raw('SET FOREIGN_KEY_CHECKS = 0;').then(function () {
-    return knex('stage_actions').truncate()
-  })
-    .then(function () {
-      return knex('stage_image').truncate();
-    }).then(function () {
-    return knex('stage2stage').truncate();
+exports.down = function (knex, Promise) {
+
+  // Truncate of cause is faster but does not work with FK
+  //for faster and unsafe delete, use SET FOREIGN_KEY_CHECKS = 0;
+  let secondary = [];
+  secondary.push(knex('stage_actions').delete());
+  secondary.push(knex('stage_image').delete());
+  secondary.push(knex('stage2stage').delete());
+  secondary.push(knex('user_item').delete());
+  secondary.push(knex('user_quest').delete());
+  return Promise.all(secondary).then(function () {
+    let primary = [];
+    primary.push(knex('stages').delete());
+    primary.push(knex('users').delete());
+    primary.push(knex('items').delete());
+    return Promise.all(primary);
   }).then(function () {
-    return knex('user_item').truncate();
-  }).then(function () {
-    return knex('user_quest').truncate();
-  }).then(function () {
-    return knex('items').truncate();
-  }).then(function () {
-    return knex('quests').truncate();
-  }).then(function () {
-    return knex('stages').truncate();
-  }).then(function () {
-    return knex('users').truncate();
-  }).then(function () {
-    return knex.raw('SET FOREIGN_KEY_CHECKS = 1;')
+    return knex('quests').delete();
   });
 };

@@ -107,7 +107,7 @@ var start = function (msg) {
         console.log("No user found, adding user");
         return addUser(msg);
       }
-      else//returning user should go to first stage
+      else //returning user should go to first stage
       {
         console.log("User found, resetting quest");
         return resetCurrentQuest(data.id).then(function () {

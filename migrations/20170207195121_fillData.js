@@ -1,6 +1,5 @@
 "use strict";
-const
-  runFile=require('../modules/runSQLFileSync');
+const runFile = require('../modules/runSQLFileSync');
 
 
 exports.up = function (knex, Promise) {

@@ -9,4 +9,4 @@ const runPromiseQueue = function (arr, index = 0) {
     })
 };
 
-module.exports=runPromiseQueue;
+module.exports = runPromiseQueue;

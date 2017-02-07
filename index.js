@@ -15,10 +15,10 @@ var start = function (msg) {
 
   return knex('users').where({
     telegram_id: chatId
-  }).select('id')
+  }).first('id')
     .then(function (data) {
       console.log(data);
-      if (data.length === 0) {
+      if (data === undefined) {
         console.log("Adding user");
         var currentdate = new Date();
         currentdate = currentdate.toISOString();
@@ -46,16 +46,16 @@ var start = function (msg) {
       else//returning user should go to first stage
       {
         return knex('user_quest').where({
-          user_id: data[0]['id']
+          user_id: data['id']
         })
           .update({"stage_id": 1})
           .then(function () {
             return knex('user_quest')
               .where({
-                user_id: data[0]['id']
+                user_id: data['id']
               })
-              .select('user_id', 'quest_id', 'stage_id').then(function (data) {
-                return data[0]
+              .first('user_id', 'quest_id', 'stage_id').then(function (data) {
+                return data
               });
           });
       }
@@ -94,7 +94,7 @@ var showStage = function (stageData, msg) {
   var images = knex('stage_image').where({
     quest_id: stageData.quest_id,
     stage_id: stageData.stage_id
-  }).select('placement', 'image','caption');
+  }).select('placement', 'image', 'caption');
   images.then(function (imagesData) {
     if (imagesData.length === 0) {
       return;
@@ -117,9 +117,39 @@ var showStage = function (stageData, msg) {
   })
 };
 
-var doStage = function (stageData) {
+var doStage = function (stageData, msg) {
   console.log('Received stage data (do):');
   console.log(stageData);
+  console.log(msg);
+  knex('stage_actions').where({
+    quest_id: stageData.quest_id,
+    stage_id: stageData.stage_id
+  }).select('value', 'module', 'extra_id').then(function (data) {
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].value === msg.text) {
+        console.log('found action: ' + msg.text);
+        if (data[i].module != undefined) {
+          console.log('found module: ' + data[i].module);
+          throw new Error('not implemented');
+          //TODO: implement module handling
+        }
+        else {
+          knex('stage2stage').where({
+            quest_id: stageData.quest_id, from_stage: stageData.stage_id, choise: 0
+          }).first('to_stage')
+            .then(function (data) {
+              var newStageData={quest_id: stageData.quest_id, user_id: stageData.user_id, stage_id: data.to_stage};
+              showStage(newStageData, msg);
+            });
+          return;
+        }
+
+      }
+
+    }
+    //if action was wrong, show stage again
+    showStage(stageData, msg);
+  })
 };
 
 
@@ -176,7 +206,7 @@ bot.on('message', function (msg) {
 
   knex('users').join('user_quest', 'users.id', '=', 'user_quest.user_id').where({
     telegram_id: chatId
-  }).select('user_id', 'quest_id', 'stage_id').then(function (stageData) {
+  }).first('user_id', 'quest_id', 'stage_id').then(function (stageData) {
     doStage(stageData, msg);
   });
   /*

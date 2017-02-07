@@ -1,9 +1,10 @@
 'use strict';
 
-var TelegramBot = require('node-telegram-bot-api'),
-    config      = require("./config/config.json"),
-    Promise     = require("bluebird"),
-    knex        = require('knex')(config.knex);
+var TelegramBot     = require('node-telegram-bot-api'),
+    config          = require("./config/config.json"),
+    Promise         = require("bluebird"),
+    getModuleResult = require("./modules/modules"),
+    knex            = require('knex')(config.knex);
 // replace the value below with the Telegram token you receive from @BotFather
 var token = config.telegram.token;
 
@@ -117,6 +118,7 @@ var showStage = function (stageData, msg) {
   })
 };
 
+
 var doStage = function (stageData, msg) {
   console.log('Received stage data (do):');
   console.log(stageData);
@@ -127,25 +129,32 @@ var doStage = function (stageData, msg) {
   }).select('value', 'module', 'extra_id').then(function (data) {
     for (var i = 0; i < data.length; i++) {
       if (data[i].value === msg.text) {
+        var choise = 0;
         console.log('found action: ' + msg.text);
         if (data[i].module != undefined) {
           console.log('found module: ' + data[i].module);
-          throw new Error('not implemented');
-          //TODO: implement module handling
+          choise = getModuleResult(knex, data[i].module, msg);
         }
         else {
-          knex('stage2stage').where({
-            quest_id: stageData.quest_id, from_stage: stageData.stage_id, choise: 0
-          }).first('to_stage')
-            .then(function (data) {
-              var newStageData={quest_id: stageData.quest_id, user_id: stageData.user_id, stage_id: data.to_stage};
-              showStage(newStageData, msg);
-            });
-          return;
+          console.log('no module, simple transfer');
         }
-
+        knex('stage2stage').where({
+          quest_id: stageData.quest_id, from_stage: stageData.stage_id, choise: choise
+        }).first('to_stage')
+          .then(function (data) {
+            return knex('user_quest').where({
+              quest_id: stageData.quest_id,
+              user_id: stageData.user_id
+            }).update({stage_id: data.to_stage}).then(function () {
+              return data.to_stage;
+            })
+          })
+          .then(function (toStage) {
+            var newStageData = {quest_id: stageData.quest_id, user_id: stageData.user_id, stage_id: toStage};
+            showStage(newStageData, msg);
+          });
+        return;
       }
-
     }
     //if action was wrong, show stage again
     showStage(stageData, msg);

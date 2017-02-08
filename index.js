@@ -6,8 +6,8 @@ var TelegramBot = require('node-telegram-bot-api'),
     knex        = require('knex')(config.knex),
     token       = config.telegram.token,
     bot         = new TelegramBot(token, {polling: true}),
-    Modules     = require("./modules/modules.js"),
-    modules     = new Modules(bot, knex),
+    Resolvers   = require("./modules/resolvers.js"),
+    resolvers   = new Resolvers(bot, knex),
     Checkers    = require("./modules/checkers.js"),
     colors      = require('colors/safe'),
     checkers    = new Checkers(bot, knex);
@@ -224,7 +224,7 @@ var doStage = function (stageData, msg) {
     quest_id: stageData.quest_id,
     stage_id: stageData.stage_id,
     value: msg.text
-  }).first('value', 'module', 'extra_id').then(function (data) {
+  }).first('value', 'resolver', 'resolver_extra_id').then(function (data) {
     if (data === undefined) {
       //no such action?!
       console.error('no action ' + msg.text + ' on stage ' + stageData.stage_id + 'in quest ' + stageData.quest_id);
@@ -232,12 +232,12 @@ var doStage = function (stageData, msg) {
       return;
     }
     var choice = Promise.resolve(0);
-    if (data.module != undefined) {
-      console.log('found module: ' + data.module);
-      choice = modules.getModuleResult(stageData.quest_id, data.module, msg, {id: data.extra_id});
+    if (data.resolver != undefined) {
+      console.log('found resolver: ' + data.resolver);
+      choice = resolvers.getResult(stageData.quest_id, data.resolver, msg, {id: data.resolver_extra_id});
     }
     else {
-      console.log('no module, simple transfer');
+      console.log('no resolver, simple transfer');
     }
     choice.then(function (chosen) {
 

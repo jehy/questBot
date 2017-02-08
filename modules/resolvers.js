@@ -5,7 +5,7 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function ModuleInit(bot, knex) {
+function Resolvers(bot, knex) {
 
   this.knex = knex;
   this.bot = bot;
@@ -16,7 +16,7 @@ function ModuleInit(bot, knex) {
  * @param msg
  * @returns {int} 1 for male, 2 for female
  */
-ModuleInit.prototype.setGender = function (msg) {
+Resolvers.prototype.setGender = function (msg) {
   var chatId = msg.from.id;
   var gender = msg.text.toLowerCase();
   var data = 'M';
@@ -38,7 +38,7 @@ ModuleInit.prototype.setGender = function (msg) {
  * @param extra{Object}
  * @returns {int} 0
  */
-ModuleInit.prototype.die = function (msg, questId, extra) {
+Resolvers.prototype.die = function (msg, questId, extra) {
   console.log("Cleaning up user items");
   var chatId = msg.from.id;
   var self = this;
@@ -60,7 +60,7 @@ ModuleInit.prototype.die = function (msg, questId, extra) {
  * @param extra{Object}
  * @returns {int} 0
  */
-ModuleInit.prototype.finish = function (msg, questId, extra) {
+Resolvers.prototype.finish = function (msg, questId, extra) {
   console.log("Cleaning up user items");
   var chatId = msg.from.id;
   var self = this;
@@ -83,7 +83,7 @@ ModuleInit.prototype.finish = function (msg, questId, extra) {
  * @param msg
  * @returns {int} 1 for male, 2 for female
  */
-ModuleInit.prototype.checkGender = function (msg) {
+Resolvers.prototype.checkGender = function (msg) {
   var chatId = msg.from.id;
   return this.knex('users').where('telegram_id', chatId).first("gender").then(function (data) {
     if (data.gender === 'M')
@@ -98,7 +98,7 @@ ModuleInit.prototype.checkGender = function (msg) {
  * @param extra{Object}
  * @returns {int} -1 we just take an item
  */
-ModuleInit.prototype.takeItem = function (msg, questId, extra) {
+Resolvers.prototype.takeItem = function (msg, questId, extra) {
   var chatId = msg.from.id;
   var self = this;
   return this.knex('users').where({
@@ -125,7 +125,7 @@ ModuleInit.prototype.takeItem = function (msg, questId, extra) {
  * @param extra{Object}
  * @returns {int} -1 we just take an item
  */
-ModuleInit.prototype.playDice = function (msg, questId, extra) {
+Resolvers.prototype.playDice = function (msg, questId, extra) {
   var chatId = msg.from.id;
   var self = this;
   var playerWins = 0;
@@ -162,14 +162,14 @@ ModuleInit.prototype.playDice = function (msg, questId, extra) {
         return 1;
       }
       else {
-        self.bot.sendMessage(chatId, "Демон выигрывает " + playerWins + ":" + DemonWins);
+        self.bot.sendMessage(chatId, "Демон выигрывает " + DemonWins + ":" + playerWins);
         return 2;
       }
     });
 };
 
 
-ModuleInit.prototype.getModuleResult = function (questId, name, msg, extra) {
+Resolvers.prototype.getResult = function (questId, name, msg, extra) {
   switch (name) {
     case'setGender':
       return this.setGender(msg, questId);
@@ -193,4 +193,4 @@ ModuleInit.prototype.getModuleResult = function (questId, name, msg, extra) {
       throw new Error('module ' + name + ' does not exist!');
   }
 };
-module.exports = ModuleInit;
+module.exports = Resolvers;

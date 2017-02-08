@@ -11,11 +11,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/jehy/quest.git"
+    "url": "git+ssh://git@bitbucket.org:onequest/quest.git"
   },
   "author": "Jehy <npm@jehy.ru>",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/jehy/quest#readme",
+  "homepage": "https://bitbucket.org/onequest/quest#readme",
   "dependencies": {
     "bluebird": "^3.4.7",
     "colors": "^1.1.2",

@@ -6,11 +6,8 @@ Telegram Quest Bot
 ---------
 
 ```bash
-git init
-git remote add origin git@bitbucket.org:onequest/quest.git
-git pull origin master
+git clone git@bitbucket.org:onequest/quest.git
 npm install
-npm install -g knex
 cp knexfile.sample.json knexfile.json
 cp config/config.sample.json config/config.json
 ```

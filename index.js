@@ -132,8 +132,8 @@ var checkActionsAvailable = function (stageData, actions, msg) {
   var actionsAvailable = [];
   return actions.then(function (actionsData) {
 
-    console.log("Full actions:");
-    console.log(actionsData);
+    //console.log("Full actions:");
+    //console.log(actionsData);
     for (var i = 0; i < actionsData.length; i++) {
       if (actionsData[i].checker != undefined) {
 
@@ -146,12 +146,12 @@ var checkActionsAvailable = function (stageData, actions, msg) {
         actionsChecks.push(Promise.resolve(1));
       }
     }
-    console.log(actionsChecks);
+    //console.log(actionsChecks);
     return Promise.all(actionsChecks)
       .then(function (dataArray) {
-        console.log('all resolved');
-        console.log("Action checks:");
-        console.log(dataArray);
+        //console.log('all resolved');
+        //console.log("Action checks:");
+        //console.log(dataArray);
         for (var i = 0; i < dataArray.length; i++) {
           if (dataArray[i] === 1)
             actionsAvailable.push({text: actionsData[i].value});
@@ -165,10 +165,10 @@ var showStage = function (stageData, msg, options) {
   console.log('Received stage data (show):');
   console.log(stageData);
   var chatId = msg.from.id;
-  var actions = knex('stage_actions').where({
+  var actions = knex('stage_actions').leftJoin('checkers', 'stage_actions.checker', 'checkers.id').where({
     quest_id: stageData.quest_id,
     stage_id: stageData.stage_id
-  }).select('value', 'checker', 'checker_extra_id');
+  }).select('stage_actions.value', 'checkers.name as checker', 'stage_actions.checker_extra_id');
   actions = checkActionsAvailable(stageData, actions, msg);
 
   if (options !== undefined && options.hideDescription === true) {//need only to reload actions
@@ -220,14 +220,14 @@ var doStage = function (stageData, msg) {
   console.log('Received stage data (do):');
   console.log(stageData);
   console.log(msg);
-  knex('stage_actions').where({
+  knex('stage_actions').leftJoin('resolvers', 'stage_actions.resolver', 'resolvers.id').where({
     quest_id: stageData.quest_id,
     stage_id: stageData.stage_id,
     value: msg.text
-  }).first('value', 'resolver', 'resolver_extra_id').then(function (data) {
+  }).first('stage_actions.value', 'resolvers.name as resolver', 'stage_actions.resolver_extra_id').then(function (data) {
     if (data === undefined) {
-      //no such action?!
-      console.error('no action ' + msg.text + ' on stage ' + stageData.stage_id + 'in quest ' + stageData.quest_id);
+      //no such action?! Try repeating stage - this is the most we can
+      console.log(colors.red('no action ' + msg.text + ' on stage ' + stageData.stage_id + ' in quest ' + stageData.quest_id));
       showStage(stageData, msg);
       return;
     }

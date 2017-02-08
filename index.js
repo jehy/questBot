@@ -224,14 +224,14 @@ var doStage = function (stageData, msg) {
     quest_id: stageData.quest_id,
     stage_id: stageData.stage_id,
     value: msg.text
-  }).first('stage_actions.value', 'resolvers.name as resolver', 'stage_actions.resolver_extra_id').then(function (data) {
+  }).first('stage_actions.value', 'stage_actions.choice', 'resolvers.name as resolver', 'stage_actions.resolver_extra_id').then(function (data) {
     if (data === undefined) {
       //no such action?! Try repeating stage - this is the most we can
       console.log(colors.red('no action ' + msg.text + ' on stage ' + stageData.stage_id + ' in quest ' + stageData.quest_id));
       showStage(stageData, msg);
       return;
     }
-    var choice = Promise.resolve(0);
+    var choice = Promise.resolve(data.choice);
     if (data.resolver != undefined) {
       console.log('found resolver: ' + data.resolver);
       choice = resolvers.getResult(stageData.quest_id, data.resolver, msg, {id: data.resolver_extra_id});

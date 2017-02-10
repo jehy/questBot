@@ -51,8 +51,8 @@ exports.up = function (knex, Promise) {
       return knex.schema.raw(`ALTER TABLE \`stage_actions\`   
   CHANGE \`resolver\` \`resolver\` INT UNSIGNED NULL,
   CHANGE \`checker\` \`checker\` INT UNSIGNED NULL,
-  ADD CONSTRAINT \`stage_actions_checker\` FOREIGN KEY (\`checker\`) REFERENCES \`quest\`.\`checkers\`(\`id\`),
-  ADD CONSTRAINT \`stage_actions_resolver\` FOREIGN KEY (\`resolver\`) REFERENCES \`quest\`.\`resolvers\`(\`id\`);`)
+  ADD CONSTRAINT \`stage_actions_checker\` FOREIGN KEY (\`checker\`) REFERENCES \`checkers\`(\`id\`),
+  ADD CONSTRAINT \`stage_actions_resolver\` FOREIGN KEY (\`resolver\`) REFERENCES \`resolvers\`(\`id\`);`)
     })
 };
 

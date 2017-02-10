@@ -7,7 +7,7 @@
     "migrate-up": "./node_modules/.bin/knex migrate:latest",
     "migrate-down": "./node_modules/.bin/knex migrate:rollback",
     "test": "./node_modules/mocha/bin/mocha",
-    "start": "node --use_strict index.js"
+    "start": "node --use_strict ./bin/start.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,8 @@
     "node-telegram-bot-api": "^0.26.0"
   },
   "devDependencies": {
-    "mocha": "^3.2.0"
+    "mocha": "^3.2.0",
+    "request": "^2.79.0",
+    "request-promise": "^4.1.1"
   }
 }
